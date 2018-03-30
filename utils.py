@@ -36,16 +36,32 @@ with open('runPagespeed.json') as json_data:
     distributionsOneMaxFCPM= req['loadingExperience']['metrics']['FIRST_CONTENTFUL_PAINT_MS']['distributions'][1]['max']
     distributionsOneProportionFCPM = req['loadingExperience']['metrics']['FIRST_CONTENTFUL_PAINT_MS']['distributions'][1]['proportion']
     #Two
-    distributionsOneMinFCPM = req['loadingExperience']['metrics']['FIRST_CONTENTFUL_PAINT_MS']['distributions'][1]['min']
-    #distributionsOneMax = req['loadingExperience']['metrics']['FIRST_CONTENTFUL_PAINT_MS']['distributions'][1]['max']
-    distributionsOneProportionFCPM = req['loadingExperience']['metrics']['FIRST_CONTENTFUL_PAINT_MS']['distributions'][1]['proportion']
+    distributionsTwoMinFCPM = req['loadingExperience']['metrics']['FIRST_CONTENTFUL_PAINT_MS']['distributions'][2]['min']
+    #distributionsTwoMax = req['loadingExperience']['metrics']['FIRST_CONTENTFUL_PAINT_MS']['distributions'][2]['max']
+    distributionsTwoProportionFCPM = req['loadingExperience']['metrics']['FIRST_CONTENTFUL_PAINT_MS']['distributions'][2]['proportion']
     #Category
     categoryFCPM = req['loadingExperience']['metrics']['FIRST_CONTENTFUL_PAINT_MS']['category']
 
     # Loading Expirience DOM
     medianDOM = req['loadingExperience']['metrics']['DOM_CONTENT_LOADED_EVENT_FIRED_MS']['median']
 
-    print(medianDOM)
+    # Zero
+    distributionsZeroMinDOM = req['loadingExperience']['metrics']['DOM_CONTENT_LOADED_EVENT_FIRED_MS']['distributions'][0]['min']
+    distributionsZeroMaxDOM = req['loadingExperience']['metrics']['DOM_CONTENT_LOADED_EVENT_FIRED_MS']['distributions'][0]['max']
+    distributionsZeroProportionDOM = req['loadingExperience']['metrics']['DOM_CONTENT_LOADED_EVENT_FIRED_MS']['distributions'][0]['proportion']
+    # One
+    distributionsOneMinDOM = req['loadingExperience']['metrics']['DOM_CONTENT_LOADED_EVENT_FIRED_MS']['distributions'][1]['min']
+    distributionsOneMaxDOM = req['loadingExperience']['metrics']['DOM_CONTENT_LOADED_EVENT_FIRED_MS']['distributions'][1]['max']
+    distributionsOneProportionDOM = req['loadingExperience']['metrics']['DOM_CONTENT_LOADED_EVENT_FIRED_MS']['distributions'][1]['proportion']
+    # Two
+    distributionsTwoMinDOM = req['loadingExperience']['metrics']['DOM_CONTENT_LOADED_EVENT_FIRED_MS']['distributions'][2]['min']
+    # distributionsTwoMax = req['loadingExperience']['metrics']['FIRST_CONTENTFUL_PAINT_MS']['distributions'][2]['max']
+    distributionsTwoProportionDOM = req['loadingExperience']['metrics']['DOM_CONTENT_LOADED_EVENT_FIRED_MS']['distributions'][2]['proportion']
+    # Category
+    categoryDOM = req['loadingExperience']['metrics']['DOM_CONTENT_LOADED_EVENT_FIRED_MS']['category']
+    #Overall category
+    overall_category = req['loadingExperience']['overall_category']
+    print(overall_category)
 
 
 
