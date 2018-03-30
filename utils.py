@@ -33,7 +33,7 @@ with open('runPagespeed.json') as json_data:
     distributionsZeroProportionFCPM = req['loadingExperience']['metrics']['FIRST_CONTENTFUL_PAINT_MS']['distributions'][0]['proportion']
     # One
     distributionsOneMinFCPM = req['loadingExperience']['metrics']['FIRST_CONTENTFUL_PAINT_MS']['distributions'][1]['min']
-    distributionsOneMax FCPM= req['loadingExperience']['metrics']['FIRST_CONTENTFUL_PAINT_MS']['distributions'][1]['max']
+    distributionsOneMaxFCPM= req['loadingExperience']['metrics']['FIRST_CONTENTFUL_PAINT_MS']['distributions'][1]['max']
     distributionsOneProportionFCPM = req['loadingExperience']['metrics']['FIRST_CONTENTFUL_PAINT_MS']['distributions'][1]['proportion']
     #Two
     distributionsOneMinFCPM = req['loadingExperience']['metrics']['FIRST_CONTENTFUL_PAINT_MS']['distributions'][1]['min']
@@ -45,7 +45,7 @@ with open('runPagespeed.json') as json_data:
     # Loading Expirience DOM
     medianDOM = req['loadingExperience']['metrics']['DOM_CONTENT_LOADED_EVENT_FIRED_MS']['median']
 
-
+    print(medianDOM)
 
 
 
