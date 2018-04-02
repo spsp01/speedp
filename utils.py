@@ -1,8 +1,210 @@
 import json
+import base64
+import write
+import requests
 
-with open('runPagespeed.json') as json_data:
-    req = json.load(json_data)
+KEY = ''
+def createimg(imagebase,type,filename):
+    imgdata = base64.urlsafe_b64decode(imagebase)
+    with open('img/tmp2/'+type+'/'+filename+'.jpg', 'wb') as f:
+        f.write(imgdata)
+    print('created img')
 
+def getscreendata(req):
+    screenshot = req['screenshot']['data']
+    return screenshot
+
+def gettitle(req):
+    title = req['title']
+    return title
+def getstatus(req):
+    responsecode= req['responseCode']
+    return responsecode
+
+def geturl(req):
+    url = req['id']
+    return url
+
+def getspeedscore(req):
+    speedscore = req['ruleGroups']['SPEED']['score']
+    return speedscore
+
+def createurljson(url,type):
+    urljson='https://www.googleapis.com/pagespeedonline/v4/runPagespeed?url='+url+'&strategy='+type + '&key='+KEY+'&screenshot=true'
+    return urljson
+
+
+def pagestats(req,type):
+    url = req['id']
+    numberResources = req['pageStats']['numberResources']
+    numberHosts = req['pageStats']['numberHosts']
+    totalRequestBytes = req['pageStats']['totalRequestBytes']
+    numberStaticResources = req['pageStats']['numberStaticResources']
+    htmlResponseBytes = req['pageStats']['htmlResponseBytes']
+    textResponseBytes = req['pageStats']['textResponseBytes']
+    overTheWireResponseBytes = req['pageStats']['overTheWireResponseBytes']
+    cssResponseBytes = req['pageStats']['cssResponseBytes']
+    imageResponseBytes = req['pageStats']['imageResponseBytes']
+    javascriptResponseBytes = req['pageStats']['javascriptResponseBytes']
+    otherResponseBytes = req['pageStats']['otherResponseBytes']
+    numberJsResources = req['pageStats']['numberJsResources']
+    numberCssResources = req['pageStats']['numberCssResources']
+    numTotalRoundTrips = req['pageStats']['numTotalRoundTrips']
+
+    pagestats = {
+        'url': url,
+        'type':type,
+        'title': gettitle(req),
+        'responsecode':getstatus(req),
+        'numberResources': numberResources,
+        'numberHosts': numberHosts,
+        'totalRequestBytes':totalRequestBytes,
+        'numberStaticResources': numberStaticResources,
+        'htmlResponseBytes':htmlResponseBytes,
+        'textResponseBytes':textResponseBytes,
+        'overTheWireResponseBytes':overTheWireResponseBytes,
+        'cssResponseBytes':cssResponseBytes,
+        'imageResponseBytes':imageResponseBytes,
+        'javascriptResponseBytes':javascriptResponseBytes,
+        'otherResponseBytes':otherResponseBytes,
+        'numberJsResources': numberJsResources,
+        'numberCssResources': numberCssResources,
+        'numTotalRoundTrips': numTotalRoundTrips,
+
+    }
+    return pagestats
+
+def speedpageopt(req,type):
+    url = req['id']
+    medianFCPM = req['loadingExperience']['metrics']['FIRST_CONTENTFUL_PAINT_MS']['median']
+    categoryFCPM = req['loadingExperience']['metrics']['FIRST_CONTENTFUL_PAINT_MS']['category']
+
+    medianDOM = req['loadingExperience']['metrics']['DOM_CONTENT_LOADED_EVENT_FIRED_MS']['median']
+    categoryDOM = req['loadingExperience']['metrics']['DOM_CONTENT_LOADED_EVENT_FIRED_MS']['category']
+
+    overall_category = req['loadingExperience']['overall_category']
+    speedScore = req['ruleGroups']['SPEED']['score']
+
+    AvoidLandingPageRedirects = req['formattedResults']['ruleResults']['AvoidLandingPageRedirects']['ruleImpact']
+    EnableGzipCompression = req['formattedResults']['ruleResults']['EnableGzipCompression']['ruleImpact']
+    LeverageBrowserCaching = req['formattedResults']['ruleResults']['LeverageBrowserCaching']['ruleImpact']
+    MainResourceServerResponseTime = req['formattedResults']['ruleResults']['MainResourceServerResponseTime']['ruleImpact']
+    MinifyCss = req['formattedResults']['ruleResults']['MinifyCss']['ruleImpact']
+    MinifyHTML = req['formattedResults']['ruleResults']['MinifyHTML']['ruleImpact']
+    MinifyJavaScript = req['formattedResults']['ruleResults']['MinifyJavaScript']['ruleImpact']
+    MinimizeRenderBlockingResources = req['formattedResults']['ruleResults']['MinimizeRenderBlockingResources']['ruleImpact']
+    OptimizeImages = req['formattedResults']['ruleResults']['OptimizeImages']['ruleImpact']
+    PrioritizeVisibleContent = req['formattedResults']['ruleResults']['PrioritizeVisibleContent']['ruleImpact']
+
+    if type== 'DESKTOP':
+        AvoidPlugins = 0
+        ConfigureViewport = 0
+        SizeContentToViewport = 0
+        SizeTapTargetsAppropriately = 0
+        UseLegibleFontSizes = 0
+    else:
+        AvoidPlugins = req['formattedResults']['ruleResults']['AvoidPlugins']['ruleImpact']
+        ConfigureViewport = req['formattedResults']['ruleResults']['ConfigureViewport']['ruleImpact']
+        SizeContentToViewport = req['formattedResults']['ruleResults']['SizeContentToViewport']['ruleImpact']
+        SizeTapTargetsAppropriately = req['formattedResults']['ruleResults']['SizeTapTargetsAppropriately']['ruleImpact']
+        UseLegibleFontSizes = req['formattedResults']['ruleResults']['UseLegibleFontSizes']['ruleImpact']
+
+    payload = {
+        'url': url,
+        'type': type,
+        'title': gettitle(req),
+        'responsecode': getstatus(req),
+        'medianFCPM': medianFCPM,
+        'categoryFCPM':categoryFCPM,
+        'medianDOM': medianDOM,
+        'categoryDOM':categoryDOM,
+        'overall_category': overall_category,
+        'speedScore': speedScore,
+        'AvoidLandingPageRedirects': AvoidLandingPageRedirects,
+        'EnableGzipCompression':EnableGzipCompression,
+        'LeverageBrowserCaching': LeverageBrowserCaching,
+        'MainResourceServerResponseTime': MainResourceServerResponseTime,
+        'MinifyCss': MinifyCss,
+        'MinifyHTML': MinifyHTML,
+        'MinifyJavaScript': MinifyJavaScript,
+        'MinimizeRenderBlockingResources': MinimizeRenderBlockingResources,
+        'OptimizeImages': OptimizeImages,
+        'PrioritizeVisibleContent': PrioritizeVisibleContent,
+        'AvoidPlugins': AvoidPlugins,
+        'ConfigureViewport': ConfigureViewport,
+        'SizeContentToViewport': SizeContentToViewport,
+        'SizeTapTargetsAppropriately': SizeTapTargetsAppropriately,
+        'UseLegibleFontSizes':UseLegibleFontSizes
+        }
+    return payload
+
+def start():
+    pages = [1,2,3,4,5]
+
+    jsonsurls = ['https://axa.pl/',
+             'https://axa.pl/ubezpieczenie-zycie-i-zdrowie/',
+             'https://axa.pl/ubezpieczenie-zycie-i-zdrowie/plan-ochronny-axa/',
+             'https://axa.pl/centrum-klienta/obsluga-ubezpieczenia-na-zycie/',
+             'https://axa.pl/emerytura/ofe-otwarty-fundusz-emerytalny/zmieniam-na-axa-ofe/']
+    titles = []
+    urls= []
+    speedscores = []
+    speedscoresm = []
+    responsecodes = []
+    stats = []
+    speed=[]
+    payload = {'titles':titles,
+               'urls': urls,
+               'speedscores':speedscores,
+               'responsecodes':responsecodes,
+               'speedscoresm':speedscoresm,
+               'stats':stats,
+               'speed':speed}
+
+    for page in pages:
+        json_data= open('json/axa_pl/03_2018/desktop/'+str(page)+'.json',encoding='UTF-8')
+        req = json.load(json_data)
+        #url = createurljson(urlj, 'desktop')
+        #print(url)
+        #req = requests.get(url, timeout=15).json()
+        print(req['id'])
+        createimg(req['screenshot']['data'], 'desktop', str(page))
+        title = gettitle(req)
+        titles.append(title)
+        urls.append(req['id'])
+        speedscores.append(req['ruleGroups']['SPEED']['score'])
+        responsecodes.append(req['responseCode'])
+        stats.append(pagestats(req, 'DESKTOP'))
+        speed.append(speedpageopt(req, 'DESKTOP'))
+
+    # for idx, urlj in enumerate(jsonsurls):
+    #     #json_data= open('json/axa_pl/03_2018/desktop/'+str(page)+'.json',encoding='UTF-8')
+    #     url= createurljson(urlj, 'desktop')
+    #     print(url)
+    #     req = requests.get(url, timeout=15).json()
+    #     print(req['id'])
+    #     createimg(req['screenshot']['data'], 'desktop', str(idx+1))
+    #     title = gettitle(req)
+    #     titles.append(title)
+    #     urls.append(req['id'])
+    #     speedscores.append(req['ruleGroups']['SPEED']['score'])
+    #     responsecodes.append(req['responseCode'])
+    #     stats.append(pagestats(req,'DESKTOP'))
+    #     speed.append(speedpageopt(req,'DESKTOP'))
+
+    for page in pages:
+        json_data = open('json/axa_pl/03_2018/mobile/' + str(page) + '.json', encoding='UTF-8')
+        req = json.load(json_data)
+        speedscoresm.append(req['ruleGroups']['SPEED']['score'])
+        stats.append(pagestats(req, 'MOBILE'))
+        speed.append(speedpageopt(req, 'MOBILE'))
+        #print(title)
+    write.createraport(payload)
+
+start()
+
+
+def getspeeddata(req):
     # Pagestats #
     pageStats = req['pageStats']
 
@@ -61,7 +263,9 @@ with open('runPagespeed.json') as json_data:
     categoryDOM = req['loadingExperience']['metrics']['DOM_CONTENT_LOADED_EVENT_FIRED_MS']['category']
     #Overall category
     overall_category = req['loadingExperience']['overall_category']
-    print(overall_category)
+
+
+
 
 
 
