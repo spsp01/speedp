@@ -41,7 +41,10 @@ def pagestats(req,type):
     totalRequestBytes = req['pageStats']['totalRequestBytes']
     numberStaticResources = req['pageStats']['numberStaticResources']
     htmlResponseBytes = req['pageStats']['htmlResponseBytes']
-    textResponseBytes = req['pageStats']['textResponseBytes']
+    if 'textResponseBytes' in req['pageStats']:
+        textResponseBytes = req['pageStats']['textResponseBytes']
+    else:
+        textResponseBytes = 0
     overTheWireResponseBytes = req['pageStats']['overTheWireResponseBytes']
     cssResponseBytes = req['pageStats']['cssResponseBytes']
     imageResponseBytes = req['pageStats']['imageResponseBytes']
@@ -76,13 +79,22 @@ def pagestats(req,type):
 
 def speedpageopt(req,type):
     url = req['id']
-    medianFCPM = req['loadingExperience']['metrics']['FIRST_CONTENTFUL_PAINT_MS']['median']
-    categoryFCPM = req['loadingExperience']['metrics']['FIRST_CONTENTFUL_PAINT_MS']['category']
+    if 'metrics' in req['loadingExperience']:
+        medianFCPM = req['loadingExperience']['metrics']['FIRST_CONTENTFUL_PAINT_MS']['median']
+        categoryFCPM = req['loadingExperience']['metrics']['FIRST_CONTENTFUL_PAINT_MS']['category']
+        medianDOM = req['loadingExperience']['metrics']['DOM_CONTENT_LOADED_EVENT_FIRED_MS']['median']
+        categoryDOM = req['loadingExperience']['metrics']['DOM_CONTENT_LOADED_EVENT_FIRED_MS']['category']
+    else:
+        medianFCPM = 0
+        categoryFCPM = 'N/A'
+        medianDOM = 0
+        categoryDOM = 'N/A'
 
-    medianDOM = req['loadingExperience']['metrics']['DOM_CONTENT_LOADED_EVENT_FIRED_MS']['median']
-    categoryDOM = req['loadingExperience']['metrics']['DOM_CONTENT_LOADED_EVENT_FIRED_MS']['category']
+    if 'overall_category' in req['loadingExperience']:
+        overall_category = req['loadingExperience']['overall_category']
+    else:
+        overall_category = 'N/A'
 
-    overall_category = req['loadingExperience']['overall_category']
     speedScore = req['ruleGroups']['SPEED']['score']
 
     AvoidLandingPageRedirects = req['formattedResults']['ruleResults']['AvoidLandingPageRedirects']['ruleImpact']
@@ -103,11 +115,30 @@ def speedpageopt(req,type):
         SizeTapTargetsAppropriately = 0
         UseLegibleFontSizes = 0
     else:
-        AvoidPlugins = req['formattedResults']['ruleResults']['AvoidPlugins']['ruleImpact']
-        ConfigureViewport = req['formattedResults']['ruleResults']['ConfigureViewport']['ruleImpact']
-        SizeContentToViewport = req['formattedResults']['ruleResults']['SizeContentToViewport']['ruleImpact']
-        SizeTapTargetsAppropriately = req['formattedResults']['ruleResults']['SizeTapTargetsAppropriately']['ruleImpact']
-        UseLegibleFontSizes = req['formattedResults']['ruleResults']['UseLegibleFontSizes']['ruleImpact']
+        if 'AvoidPlugins' in req['formattedResults']['ruleResults']:
+            AvoidPlugins = req['formattedResults']['ruleResults']['AvoidPlugins']['ruleImpact']
+        else:
+            AvoidPlugins =0
+
+        if 'ConfigureViewport' in req['formattedResults']['ruleResults']:
+            ConfigureViewport = req['formattedResults']['ruleResults']['ConfigureViewport']['ruleImpact']
+        else:
+            ConfigureViewport = 0
+
+        if 'SizeContentToViewport' in req['formattedResults']['ruleResults']:
+            SizeContentToViewport = req['formattedResults']['ruleResults']['SizeContentToViewport']['ruleImpact']
+        else:
+            SizeContentToViewport = 0
+
+        if 'SizeTapTargetsAppropriately' in req['formattedResults']['ruleResults']:
+            SizeTapTargetsAppropriately = req['formattedResults']['ruleResults']['SizeTapTargetsAppropriately']['ruleImpact']
+        else:
+            SizeTapTargetsAppropriately = 0
+
+        if 'UseLegibleFontSizes' in req['formattedResults']['ruleResults']:
+            UseLegibleFontSizes = req['formattedResults']['ruleResults']['UseLegibleFontSizes']['ruleImpact']
+        else:
+            UseLegibleFontSizes =0
 
     payload = {
         'url': url,
@@ -141,11 +172,11 @@ def speedpageopt(req,type):
 def start():
     pages = [1,2,3,4,5]
 
-    jsonsurls = ['https://axa.pl/',
-             'https://axa.pl/ubezpieczenie-zycie-i-zdrowie/',
-             'https://axa.pl/ubezpieczenie-zycie-i-zdrowie/plan-ochronny-axa/',
-             'https://axa.pl/centrum-klienta/obsluga-ubezpieczenia-na-zycie/',
-             'https://axa.pl/emerytura/ofe-otwarty-fundusz-emerytalny/zmieniam-na-axa-ofe/']
+    jsonsurls = ['https://www.purina.pl/pies/beyond/',
+             'https://www.purina.pl/pies/beyond/karmadlapsa/simply-9-losos/',
+             'https://www.purina.pl/pies/beyond/dlaczego-beyond/regulacje/',
+             'https://www.purina.pl/pies/beyond/dlaczego-beyond/pozyskiwanie-skladnikow/',
+             'https://www.purina.pl/pies/beyond/karmadlapsa/simply-9-kurczak/']
     titles = []
     urls= []
     speedscores = []
@@ -161,43 +192,55 @@ def start():
                'stats':stats,
                'speed':speed}
 
-    for page in pages:
-        json_data= open('json/axa_pl/03_2018/desktop/'+str(page)+'.json',encoding='UTF-8')
-        req = json.load(json_data)
-        #url = createurljson(urlj, 'desktop')
-        #print(url)
-        #req = requests.get(url, timeout=15).json()
-        print(req['id'])
-        createimg(req['screenshot']['data'], 'desktop', str(page))
-        title = gettitle(req)
-        titles.append(title)
-        urls.append(req['id'])
-        speedscores.append(req['ruleGroups']['SPEED']['score'])
-        responsecodes.append(req['responseCode'])
-        stats.append(pagestats(req, 'DESKTOP'))
-        speed.append(speedpageopt(req, 'DESKTOP'))
-
-    # for idx, urlj in enumerate(jsonsurls):
-    #     #json_data= open('json/axa_pl/03_2018/desktop/'+str(page)+'.json',encoding='UTF-8')
-    #     url= createurljson(urlj, 'desktop')
-    #     print(url)
-    #     req = requests.get(url, timeout=15).json()
+    # for page in pages:
+    #     json_data= open('json/axa_pl/03_2018/desktop/'+str(page)+'.json',encoding='UTF-8')
+    #     req = json.load(json_data)
+    #     #url = createurljson(urlj, 'desktop')
+    #     #print(url)
+    #     #req = requests.get(url, timeout=15).json()
     #     print(req['id'])
-    #     createimg(req['screenshot']['data'], 'desktop', str(idx+1))
+    #     createimg(req['screenshot']['data'], 'desktop', str(page))
     #     title = gettitle(req)
     #     titles.append(title)
     #     urls.append(req['id'])
     #     speedscores.append(req['ruleGroups']['SPEED']['score'])
     #     responsecodes.append(req['responseCode'])
-    #     stats.append(pagestats(req,'DESKTOP'))
-    #     speed.append(speedpageopt(req,'DESKTOP'))
+    #     stats.append(pagestats(req, 'DESKTOP'))
+    #     speed.append(speedpageopt(req, 'DESKTOP'))
 
-    for page in pages:
-        json_data = open('json/axa_pl/03_2018/mobile/' + str(page) + '.json', encoding='UTF-8')
-        req = json.load(json_data)
+    for idx, urlj in enumerate(jsonsurls):
+        #json_data= open('json/axa_pl/03_2018/desktop/'+str(page)+'.json',encoding='UTF-8')
+        url= createurljson(urlj, 'desktop')
+        print(url)
+        req = requests.get(url, timeout=15).json()
+        print(req['id'])
+        createimg(req['screenshot']['data'], 'desktop', str(idx+1))
+        title = gettitle(req)
+        titles.append(title)
+        urls.append(req['id'])
+        speedscores.append(req['ruleGroups']['SPEED']['score'])
+        responsecodes.append(req['responseCode'])
+        stats.append(pagestats(req,'DESKTOP'))
+        speed.append(speedpageopt(req,'DESKTOP'))
+
+    for idx, urlj in enumerate(jsonsurls):
+        url= createurljson(urlj, 'mobile')
+        print(url)
+        req = requests.get(url, timeout=15).json()
+        print(req['id'])
+        createimg(req['screenshot']['data'], 'mobile', str(idx+1))
+        #title = gettitle(req)
+        #titles.append(title)
+        #urls.append(req['id'])
         speedscoresm.append(req['ruleGroups']['SPEED']['score'])
+        #responsecodes.append(req['responseCode'])
         stats.append(pagestats(req, 'MOBILE'))
         speed.append(speedpageopt(req, 'MOBILE'))
+
+        # json_data = open('json/axa_pl/03_2018/mobile/' + str(page) + '.json', encoding='UTF-8')
+        # req = json.load(json_data)
+        # speedscoresm.append(req['ruleGroups']['SPEED']['score'])
+
         #print(title)
     write.createraport(payload)
 

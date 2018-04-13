@@ -41,11 +41,11 @@ def createraport(payload):
     urlm = ['C39', 'K39', 'S39', 'AA39', 'AI39']
 
     for i in range(5):
-        img = Image('img/tmp/desktop/'+str(i+1)+'.jpg')
+        img = Image('img/tmp2/desktop/'+str(i+1)+'.jpg')
         renderd.add_image(img, imagep[i])
 
     for i in range(5):
-        img = Image('img/tmp/mobile/' + str(i + 1) + '.jpg')
+        img = Image('img/tmp2/mobile/' + str(i + 1) + '.jpg')
         renderm.add_image(img, imagem[i])
 
     for i, title in enumerate(payload['titles']):
